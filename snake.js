@@ -1,3 +1,6 @@
 /* global Phaser */
+const startGame = {} => {
+    console.log('Start Game')
+}
 
-console.log("Hello, World!")
+startGame{}

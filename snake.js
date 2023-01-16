@@ -77,11 +77,64 @@ const getContainerSize = () => {
 }
 
 const getProjectors = (containerSize, game) => {
-    return{}
+    const widthRatio = containerSize.width / game.width
+    const heightRatio = containerSize.height / game.height
+    const unitOnScreen = Math.min(widthRatio, heightRatio)
+
+    return{
+        projectDistance: distance => distance * unitOnScreen,
+        projectPosition: position => position.scaleBy(unitOnScreen)
+    }
 }
 
-const render = (state) => {
-    console.log('render')
+const getContext = (width, height) => {
+    const [existing] = document.getElementsByTagName('canvas')
+    const canvas = existing || document.createElement('canvas')
+    if (!existing) {
+      getContainer().appendChild(canvas)
+    }
+    const context = canvas.getContext('2d')
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    canvas.setAttribute('width', width)
+    canvas.setAttribute('height', height)
+    return context
+}
+
+const renderCells = (context, cellSide, width, height) => {
+
+}
+
+const renderFood = (context, cellSide, { x, y }) => {
+
+}
+
+const renderSnake = (context, cellSide, snake) => {
+
+}
+
+const renderScores = (score, bestScore) => {
+
+}
+
+const render = ({
+    game: {
+        width,
+        height,
+        food,
+        snake,
+        score
+      },
+      bestScore,
+      projectDistance,
+      projectPosition
+}) => {
+    const [viewWidth, viewHeight] = [width, height].map(projectDistance)
+    const context = getContext(viewWidth, viewHeight)
+    const cellSide = viewWidth / width
+    renderCells(context, cellSide, width, height)
+    renderFood(context, cellSide, projectPosition(food))
+    renderSnake(context, cellSide, snake.map(projectPosition))
+    renderScores(score, bestScore)
 }
 
 // #region main
@@ -106,21 +159,22 @@ const startGame = () => {
         state = { ...state, ...props }
     }
     
-window.addEventListener('resize', () => {
-    console.log('resize')
-})
-window.addEventListener('keydown', ({ which }) => {
-    console.log('keydown:', which)
-})
-window.addEventtListener('keyup', ({which}) => {
-    console.log('keyup:', which)
-})
-const tick = () => {
-    const newProps = getNewStatePropsOnTick(state)
-    updateState(newProps)
-    render(state)
-}
-setInterval(tick, UPDATE_EVERY)
+    window.addEventListener('resize', () => {
+        console.log('resize')
+    })
+    window.addEventListener('keydown', ({wich}) => {
+        console.log('keydown:', which)
+    })
+    window.addEventtListener('keyup', ({which}) => {
+        console.log('keyup:', which)
+    })
+    const tick = () => {
+        const newProps = getNewStatePropsOnTick(state)
+        updateState(newProps)
+        render(state)
+    }
+    tick()
+//setInterval(tick, UPDATE_EVERY)
 }
 // #endregion
 startGame()

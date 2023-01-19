@@ -1,5 +1,8 @@
 /* global Phaser */
 
+// region general utils
+const getRange = length => [...Array(length).keys()]
+
 // #region geometry
 class Vector {
     constructor(x, y) {
@@ -101,19 +104,33 @@ const getContext = (width, height) => {
 }
 
 const renderCells = (context, cellSide, width, height) => {
-
+    context.globalAlpha = 0.2
+    getRange(width).forEach(column => getRange(height).forEach(row => {
+      if ((column + row) % 2 === 1) {
+        context.fillRect(column * cellSide, row * cellSide, cellSide, cellSide)
+      }
+    }))
+    context.globalAlpha = 1
 }
 
 const renderFood = (context, cellSide, { x, y }) => {
-
+    context.beginPath()
+    context.arc(x, y, cellSide / 2.5, 0, 2 * Math.PI)
+    context.fillStyle = '#e74c3c'
+    context.fill()
 }
 
 const renderSnake = (context, cellSide, snake) => {
-
+    context.lineWidth = cellSide
+    context.strokeStyle = '#3498db'
+    context.beginPath()
+    snake.forEach(({ x, y }) => context.lineTo(x, y))
+    context.stroke()
 }
 
 const renderScores = (score, bestScore) => {
-
+    document.getElementById('current-score').innerText = score
+    document.getElementById('best-score').innerText = bestScore
 }
 
 const render = ({
@@ -173,8 +190,8 @@ const startGame = () => {
         updateState(newProps)
         render(state)
     }
-    tick()
-//setInterval(tick, UPDATE_EVERY)
+    setInterval(tick, UPDATE_EVERY)
 }
 // #endregion
+
 startGame()
